@@ -5,6 +5,10 @@ import '../providers/products_provider.dart';
 import '../widgets/product_item.dart';
 
 class ProductGrid extends StatelessWidget {
+  final bool showFavorite;
+
+  ProductGrid(this.showFavorite);
+
   @override
   Widget build(BuildContext context) {
     // Provider listener if data change.
@@ -13,17 +17,22 @@ class ProductGrid extends StatelessWidget {
     final productData = Provider.of<ProductProvide>(context);
 
     // Here we get list of items from "productData" that is ProductProvide object.
-    final products = productData.items;
+    final products =
+    showFavorite ? productData.favoriteItems : productData.items;
 
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       itemCount: products.length,
 
       //Pass data using Provider to "ProductItem" class.
-      itemBuilder: (context, index) => ChangeNotifierProvider(
-        create: (context) => products[index],
-        child: ProductItem(),
-      ),
+      // As we are not using context in create: (context) => ProductProvide(),
+      // So we can simple remove using ChangeNotifierProvider.value as this Constructor simple take value argument..
+      // Is recommended to use ChangeNotifierProvider.value() with value / object already exist.
+      itemBuilder: (context, index) =>
+          ChangeNotifierProvider.value(
+            value: products[index],
+            child: ProductItem(),
+          ),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 3 / 2,

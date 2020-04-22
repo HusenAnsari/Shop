@@ -10,6 +10,8 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // ChangeNotifierProvider(create: (context)) is recommended if we create of first time otherwise we use
+    // ChangeNotifierProvider.value( value: )
     return ChangeNotifierProvider(
       //Pass instant of provider class.
       create: (context) => ProductProvide(),
