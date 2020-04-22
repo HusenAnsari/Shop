@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import './product.dart';
 
 // Here we are using ChangeNotifier to notify all dependent widget that data is changed.
 class ProductProvide with ChangeNotifier {

@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      //Pass instant od provider class.
+      //Pass instant of provider class.
       create: (context) => ProductProvide(),
       child: MaterialApp(
         title: 'Shop',
