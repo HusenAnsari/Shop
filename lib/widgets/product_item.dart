@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop/providers/product.dart';
+import 'package:shop/providers/cart.dart';
 
+import '../providers/cart.dart';
+import '../providers/product.dart';
 import '../screens/product_detail_screen.dart';
 
 class ProductItem extends StatelessWidget {
@@ -10,6 +12,7 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     //get data using Provider which is sanded from "ProductGrid" class.
     final product = Provider.of<Product>(context, listen: false);
+    final cart = Provider.of<Cart>(context, listen: false);
 
     // We can also use Consumer instead of "Provider.of"
     // When we run Provider.of all build() re-run when data change;
@@ -58,7 +61,9 @@ class ProductItem extends StatelessWidget {
           trailing: IconButton(
             color: Theme.of(context).accentColor,
             icon: Icon(Icons.shopping_cart),
-            onPressed: () {},
+            onPressed: () {
+              cart.addItem(product.id, product.price, product.title);
+            },
           ),
         ),
       ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop/providers/products_provider.dart';
 
+import './providers/cart.dart';
+import './providers/products_provider.dart';
 import './screens/product_detail_screen.dart';
 import './screens/product_overview_screen.dart';
 
@@ -12,9 +13,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // ChangeNotifierProvider(create: (context)) is recommended if we create of first time otherwise we use
     // ChangeNotifierProvider.value( value: )
-    return ChangeNotifierProvider(
-      //Pass instant of provider class.
-      create: (context) => ProductProvide(),
+
+    // Multi provider
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          //Pass instant of provider class.
+          create: (context) => ProductProvide(),
+        ),
+        ChangeNotifierProvider(
+          //Pass instant of provider class.
+          create: (context) => Cart(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Shop',
         theme: ThemeData(
