@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/providers/orders.dart';
 
 import '../providers/cart.dart' show Cart;
 import '../widgets/cart_item.dart';
@@ -9,6 +10,7 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Listener
     final cart = Provider.of<Cart>(context);
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +33,7 @@ class CartScreen extends StatelessWidget {
                   Spacer(),
                   Chip(
                     label: Text(
-                      '\$${cart.totalAmount}',
+                      '\$${cart.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
                           color:
                           Theme
@@ -51,7 +53,16 @@ class CartScreen extends StatelessWidget {
                           .of(context)
                           .primaryColor),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      // - Here "cart.items" return Map from Cart.dart class and we need only value from Map.
+                      // - so we use ".values.toList()" as .value give us the Iterable we need to convert
+                      //   to List using ".toList()"
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                        cart.items.values.toList(),
+                        cart.totalAmount,
+                      );
+                      cart.clearCart();
+                    },
                   ),
                 ],
               ),
