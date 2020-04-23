@@ -25,24 +25,22 @@ class Cart with ChangeNotifier {
       // update() contain existingItem value.
       _items.update(
         productId,
-            (existingItem) =>
-            CartItem(
-              // Value assign same only quantity update with 1.
-              id: existingItem.id,
-              title: existingItem.title,
-              price: existingItem.price,
-              quantity: existingItem.quantity + 1,
-            ),
+        (existingItem) => CartItem(
+          // Value assign same only quantity update with 1.
+          id: existingItem.id,
+          title: existingItem.title,
+          price: existingItem.price,
+          quantity: existingItem.quantity + 1,
+        ),
       );
     } else {
       _items.putIfAbsent(
         productId,
-            () =>
-            CartItem(
-                title: title,
-                id: DateTime.now().toString(),
-                price: price,
-                quantity: 1),
+        () => CartItem(
+            title: title,
+            id: DateTime.now().toString(),
+            price: price,
+            quantity: 1),
       );
     }
     notifyListeners();
@@ -51,7 +49,7 @@ class Cart with ChangeNotifier {
   double get totalAmount {
     var total = 0.0;
     _items.forEach(
-          (key, cartItem) {
+      (key, cartItem) {
         total += cartItem.price * cartItem.quantity;
       },
     );
@@ -77,13 +75,12 @@ class Cart with ChangeNotifier {
       // _items.update() method return existingItem value.
       _items.update(
         productId,
-            (existingItem) =>
-            CartItem(
-              id: existingItem.id,
-              title: existingItem.title,
-              price: existingItem.price,
-              quantity: existingItem.quantity - 1,
-            ),
+        (existingItem) => CartItem(
+          id: existingItem.id,
+          title: existingItem.title,
+          price: existingItem.price,
+          quantity: existingItem.quantity - 1,
+        ),
       );
     } else {
       _items.remove(productId);
