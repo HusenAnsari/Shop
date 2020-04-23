@@ -35,6 +35,29 @@ class CartItem extends StatelessWidget {
       ),
       // direction is use to provide direction in which direction can dismiss.
       direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) {
+        return showDialog(
+            context: context,
+            builder: (ctx) =>
+                AlertDialog(
+                  title: Text('Are you sure?'),
+                  content: Text('Do you want to remove item from cart?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('NO'),
+                      onPressed: () {
+                        Navigator.of(ctx).pop(false);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text('YES'),
+                      onPressed: () {
+                        Navigator.of(ctx).pop(true);
+                      },
+                    ),
+                  ],
+                ));
+      },
       // onDismissed give you the direction on which direction you want to perform which operation.
       onDismissed: (direction) {
         Provider.of<Cart>(context, listen: false).removeItem(productId);

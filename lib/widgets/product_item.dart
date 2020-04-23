@@ -63,6 +63,27 @@ class ProductItem extends StatelessWidget {
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
+              // Using below we establish the connection to nearest scaffold widget.
+              // It,s not working if you use in same widget tree as a scaffold.
+              // Nearest Scaffold widget is "product_overview_screen scaffold"
+              // Scaffold.of(context).openDrawer() because ti's nearest scaffold widget contain drawer.
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Added item to the cart!',
+                  ),
+                  duration: Duration(
+                    seconds: 2,
+                  ),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      cart.removeSingleItem(product.id);
+                    },
+                  ),
+                ),
+              );
             },
           ),
         ),
