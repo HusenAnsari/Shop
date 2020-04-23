@@ -61,6 +61,22 @@ class ProductProvide with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateProduct(String id, Product newProduct) {
+    final productIndex = _items.indexWhere((product) => product.id == id);
+    // When we get productIndex then we assign newProduct to that index;
+    if (productIndex >= 0) {
+      _items[productIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  }
+
+  void deleteProduct(String id) {
+    _items.removeWhere((product) => product.id == id);
+    notifyListeners();
+  }
+
   // Get Product detail by id.
   Product findProductById(String id) {
     return _items.firstWhere((product) => product.id == id);

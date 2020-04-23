@@ -22,12 +22,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   // we need dispose FocusNode when state cleared
   // otherwise focusNode lead in memory and cause memory leak.
-  var _editedProduct =
-  Product(id: null,
-      title: '',
-      description: '',
-      imageUrl: '',
-      price: 0);
+  var _editedProduct = Product(
+    id: null,
+    title: '',
+    description: '',
+    imageUrl: '',
+    price: 0,
+  );
 
   @override
   void dispose() {
@@ -40,10 +41,53 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _imageFocusNode.dispose();
   }
 
+  // Created to assign edit product value.
+  var initValues = {
+    'title': '',
+    'description': '',
+    'imageUrl': '',
+    'price': '',
+  };
+
+  var _isInit = true;
+
   @override
   void initState() {
     super.initState();
     _imageFocusNode.addListener(_updateImageUrl);
+  }
+
+  // didChangeDependencies() always run when page load.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      // getting productId as a argument from " UserProductItem " screen. when user click on edit button.
+      // we are getting single argument data so we defined " as String "  in ModalRoute.
+      var productId = ModalRoute
+          .of(context)
+          .settings
+          .arguments as String;
+      // - As we use this page to create product at that it the productId = null.
+      //   We only get productId when we edit product.
+      // - So wee need to check that productId before edit product.
+      if (productId != null) {
+        var product = Provider.of<ProductProvide>(context, listen: false)
+            .findProductById(productId);
+        _editedProduct = product;
+        // Assign edit product value to initValue.
+        initValues = {
+          'title': _editedProduct.title,
+          'description': _editedProduct.description,
+          // we can not use same for image as we need to set value to imageController.
+          //'imageUrl': _editedProduct.imageUrl,
+          'price': _editedProduct.price.toString(),
+        };
+        // Setting imageUrl value to image Controller.
+        _imageUrlControler.text = _editedProduct.imageUrl;
+      }
+    }
+    _isInit = false;
   }
 
   void _updateImageUrl() {
@@ -68,8 +112,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState.save();
-    Provider.of<ProductProvide>(context, listen: false)
-        .addProduct(_editedProduct);
+    // We get _editedProduct.id if we edit product.
+    if (_editedProduct.id != null) {
+      Provider.of<ProductProvide>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      Provider.of<ProductProvide>(context, listen: false)
+          .addProduct(_editedProduct);
+    }
     Navigator.of(context).pop();
   }
 
@@ -93,6 +143,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             children: <Widget>[
               TextFormField(
+                // to set edit product value to TextFormField.
+                initialValue: initValues['title'],
+
                 decoration: InputDecoration(
                   labelText: 'Title',
                 ),
@@ -116,7 +169,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 // and save Title into _editedProduct.
                 onSaved: (value) {
                   _editedProduct = Product(
-                    id: null,
+                    id: _editedProduct.id,
+                    isFavorite: _editedProduct.isFavorite,
                     title: value,
                     price: _editedProduct.price,
                     description: _editedProduct.description,
@@ -125,6 +179,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: initValues['price'],
                 decoration: InputDecoration(
                   labelText: 'Price',
                 ),
@@ -136,7 +191,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
-                    id: null,
+                    id: _editedProduct.id,
+                    isFavorite: _editedProduct.isFavorite,
                     title: _editedProduct.title,
                     price: double.parse(value),
                     description: _editedProduct.description,
@@ -160,6 +216,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: initValues['description'],
                 decoration: InputDecoration(
                   labelText: 'Description',
                 ),
@@ -168,7 +225,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 focusNode: _descriptionFocusNote,
                 onSaved: (value) {
                   _editedProduct = Product(
-                    id: null,
+                    id: _editedProduct.id,
+                    isFavorite: _editedProduct.isFavorite,
                     title: _editedProduct.title,
                     price: _editedProduct.price,
                     description: value,
@@ -211,6 +269,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      // We can not use initialValue here because we use controller here.
+                      //initialValue: initValues['imageUrl'],
+
                       decoration: InputDecoration(labelText: 'Image URL'),
                       keyboardType: TextInputType.url,
                       textInputAction: TextInputAction.done,
@@ -221,7 +282,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       },
                       onSaved: (value) {
                         _editedProduct = Product(
-                          id: null,
+                          id: _editedProduct.id,
+                          isFavorite: _editedProduct.isFavorite,
                           title: _editedProduct.title,
                           price: _editedProduct.price,
                           description: _editedProduct.description,
