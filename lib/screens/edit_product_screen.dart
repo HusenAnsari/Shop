@@ -50,6 +50,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   };
 
   var _isInit = true;
+  var _isLoading = false;
 
   @override
   void initState() {
@@ -112,15 +113,30 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
+
     // We get _editedProduct.id if we edit product.
     if (_editedProduct.id != null) {
       Provider.of<ProductProvide>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
+      setState(() {
+        _isLoading = true;
+      });
+      Navigator.of(context).pop();
     } else {
+      // Here we are using .than because noe addProduct() return Future in ProductProvide class.
       Provider.of<ProductProvide>(context, listen: false)
-          .addProduct(_editedProduct);
+          .addProduct(_editedProduct)
+      // then() return nothing that's why we use _ as a nothing in .then(_)
+          .then((_) {
+        setState(() {
+          _isLoading = true;
+        });
+        Navigator.of(context).pop();
+      });
     }
-    Navigator.of(context).pop();
   }
 
   @override
@@ -135,7 +151,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(),
+      )
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           // assign key with _form which we create.
@@ -187,7 +207,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 keyboardType: TextInputType.number,
                 focusNode: _priceFocusNote,
                 onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_descriptionFocusNote);
+                  FocusScope.of(context)
+                      .requestFocus(_descriptionFocusNote);
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
