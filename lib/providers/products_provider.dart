@@ -53,12 +53,12 @@ class ProductProvide with ChangeNotifier {
   }
 
   // Assign Future type to addProduct() to get some data after http.post() and show loader.
-  Future<void> addProduct(Product product) {
-    //Firebase database URL = https://fir-product-e52b8.firebaseio.com/
+  Future<void> addProduct(Product product) async {
+    //Firebase database URL = https://"...".firebaseio.com/
     // Here we are adding "/products" to create folder / collection in firebase database.
     // We have to add ".json at the add of url because firebase need that to parse request"
-    const url = 'Your Firebase database URL goes here!';
-
+    //const url = 'Your Firebase database URL goes here!';
+    const url = 'https://fir-product-e52b8.firebaseio.com/products.json';
     // body: use to pass data and we need to pass json data in body.
     // json.encode convert object into json.
     return http
@@ -72,23 +72,25 @@ class ProductProvide with ChangeNotifier {
         'isFavorite': product.isFavorite,
       }),
     )
-    // .then() execute after .post() method successfully submitted data get we get response in .than() method
-        .then(
-          (response) {
-        // To print firebase response data.
-        // json.decode(response.body) return {'name': firebase id that is in firebase database console}
-        //print(json.decode(response.body));
-        final newProduct = Product(
-          id: json.decode(response.body)['name'],
-          title: product.title,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: product.price,
-        );
-        _items.add(newProduct);
-        notifyListeners();
-      },
-    );
+        .then((response) {
+      // .then() execute after .post() method successfully submitted data get we get response in .than() method
+      // To print firebase response data.
+      // json.decode(response.body) return {'name': firebase id that is in firebase database console}
+      //print(json.decode(response.body));
+      final newProduct = Product(
+        id: json.decode(response.body)['name'],
+        title: product.title,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+      );
+      _items.add(newProduct);
+      notifyListeners();
+    }).catchError((error) {
+      //print(error);
+      // to throw error because we need this error on EditProductScreen.
+      throw error;
+    });
   }
 
   void updateProduct(String id, Product newProduct) {

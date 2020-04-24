@@ -122,17 +122,34 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Provider.of<ProductProvide>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
       setState(() {
-        _isLoading = true;
+        _isLoading = false;
       });
       Navigator.of(context).pop();
     } else {
       // Here we are using .than because noe addProduct() return Future in ProductProvide class.
       Provider.of<ProductProvide>(context, listen: false)
           .addProduct(_editedProduct)
-      // then() return nothing that's why we use _ as a nothing in .then(_)
-          .then((_) {
+          .catchError((error) {
+        return showDialog(
+          context: context,
+          builder: (ctx) =>
+              AlertDialog(
+                title: Text('An Error occurred'),
+                content: Text('Something went wrong'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                    },
+                  )
+                ],
+              ),
+        );
+      }).then((_) {
+        // then() return nothing that's why we use _ as a nothing in .then(_)
         setState(() {
-          _isLoading = true;
+          _isLoading = false;
         });
         Navigator.of(context).pop();
       });
