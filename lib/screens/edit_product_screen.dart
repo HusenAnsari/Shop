@@ -119,12 +119,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     // We get _editedProduct.id if we edit product.
     if (_editedProduct.id != null) {
-      Provider.of<ProductProvide>(context, listen: false)
+      await Provider.of<ProductProvide>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
     } else {
       // Here we are using .than because noe addProduct() return Future in ProductProvide class.
       try {
@@ -147,14 +143,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ],
               ),
         );
-      } finally {
+      }
+      /*finally {
         // then() return nothing that's why we use _ as a nothing in .then(_)
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      }
+      }*/
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop();
   }
 
   @override

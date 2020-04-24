@@ -13,6 +13,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
     return ListTile(
       title: Text(title),
       // backgroundImage in CircleAvatar take ImageProvider.
@@ -35,9 +36,20 @@ class UserProductItem extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
-                Provider.of<ProductProvide>(context, listen: false)
-                    .deleteProduct(id);
+              onPressed: () async {
+                try {
+                  await Provider.of<ProductProvide>(context, listen: false)
+                      .deleteProduct(id);
+                } catch (error) {
+                  // We need to assign Scaffold to build() method.
+                  // Because .of(context) we can change in async.
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      duration: Duration(seconds: 2),
+                      content: Text('Deleting faild!'),
+                    ),
+                  );
+                }
               },
               color: Theme
                   .of(context)
