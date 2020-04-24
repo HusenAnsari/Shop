@@ -104,7 +104,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     // - This will trigger all validator written in TextFormField in Form.
     // - It's return true if all validator return null and
     //   return false if any validator return string and has ana error.
@@ -127,10 +127,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Navigator.of(context).pop();
     } else {
       // Here we are using .than because noe addProduct() return Future in ProductProvide class.
-      Provider.of<ProductProvide>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog(
+      try {
+        await Provider.of<ProductProvide>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog(
           context: context,
           builder: (ctx) =>
               AlertDialog(
@@ -146,13 +147,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ],
               ),
         );
-      }).then((_) {
+      } finally {
         // then() return nothing that's why we use _ as a nothing in .then(_)
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
     }
   }
 

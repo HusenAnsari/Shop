@@ -53,30 +53,27 @@ class ProductProvide with ChangeNotifier {
   }
 
   // Assign Future type to addProduct() to get some data after http.post() and show loader.
+  // When we use async automatically all code of this function wrap in Future. that's now we no need to return future.
   Future<void> addProduct(Product product) async {
     //Firebase database URL = https://"...".firebaseio.com/
     // Here we are adding "/products" to create folder / collection in firebase database.
     // We have to add ".json at the add of url because firebase need that to parse request"
-    //const url = 'Your Firebase database URL goes here!';
     const url = 'https://fir-product-e52b8.firebaseio.com/products.json';
     // body: use to pass data and we need to pass json data in body.
     // json.encode convert object into json.
-    return http
-        .post(
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((response) {
-      // .then() execute after .post() method successfully submitted data get we get response in .than() method
-      // To print firebase response data.
-      // json.decode(response.body) return {'name': firebase id that is in firebase database console}
-      //print(json.decode(response.body));
+    // await finish http method first
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        }),
+      );
+
       final newProduct = Product(
         id: json.decode(response.body)['name'],
         title: product.title,
@@ -86,11 +83,10 @@ class ProductProvide with ChangeNotifier {
       );
       _items.add(newProduct);
       notifyListeners();
-    }).catchError((error) {
-      //print(error);
-      // to throw error because we need this error on EditProductScreen.
+    } catch (error) {
       throw error;
-    });
+    }
+    // Below code execute once http.post() done because of await
   }
 
   void updateProduct(String id, Product newProduct) {
