@@ -46,24 +46,7 @@ class CartScreen extends StatelessWidget {
                         .of(context)
                         .primaryColor,
                   ),
-                  FlatButton(
-                    child: Text(
-                      'ORDER NOW',
-                      style: TextStyle(color: Theme
-                          .of(context)
-                          .primaryColor),
-                    ),
-                    onPressed: () {
-                      // - Here "cart.items" return Map from Cart.dart class and we need only value from Map.
-                      // - so we use ".values.toList()" as .value give us the Iterable we need to convert
-                      //   to List using ".toList()"
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        cart.items.values.toList(),
-                        cart.totalAmount,
-                      );
-                      cart.clearCart();
-                    },
-                  ),
+                  OrderButton(cart: cart),
                 ],
               ),
             ),
@@ -91,6 +74,54 @@ class CartScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: _isLoading
+          ? CircularProgressIndicator()
+          : Text(
+        'ORDER NOW',
+        style: TextStyle(color: Theme
+            .of(context)
+            .primaryColor),
+      ),
+      onPressed: (widget.cart.totalAmount <= 0 || _isLoading)
+          ? null
+          : () async {
+        setState(() {
+          _isLoading = true;
+        });
+        // - Here "cart.items" return Map from Cart.dart class and we need only value from Map.
+        // - so we use ".values.toList()" as .value give us the Iterable we need to convert
+        //   to List using ".toList()"
+        await Provider.of<Orders>(context, listen: false).addOrder(
+          widget.cart.items.values.toList(),
+          widget.cart.totalAmount,
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        widget.cart.clearCart();
+      },
     );
   }
 }

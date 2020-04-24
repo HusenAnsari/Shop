@@ -61,6 +61,9 @@ class ProductProvide with ChangeNotifier {
       //  -M5fUw5vtKbJ1XyP-JCL: {description: Aeroplane with great features., imageUrl: https://homepages.cae.wisc.edu/~ece533/images/airplane.png, isFavorite: false, price: 100.99, title: Aeroplane}}
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) {
+        return;
+      }
       final List<Product> loadedProduct = [];
       extractedData.forEach((prodId, productData) {
         loadedProduct.add(
