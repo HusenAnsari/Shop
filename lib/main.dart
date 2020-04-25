@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, ProductProvide>(
           create: (context) => ProductProvide(),
           update: (context, auth, previousProduct) =>
-          previousProduct..update(auth.token),
+          previousProduct..update(auth.token, auth.userId),
         ),
         ChangeNotifierProvider(
           //Pass instant of provider class.

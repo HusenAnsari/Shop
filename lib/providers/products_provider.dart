@@ -44,9 +44,11 @@ class ProductProvide with ChangeNotifier {
   ];
 
   String authToken;
+  String userId;
 
-  void update(String token) {
+  void update(String token, String loginUserId) {
     authToken = token;
+    userId = loginUserId;
   }
 
   //ProductProvide(this.authToken, this._items);
@@ -61,7 +63,7 @@ class ProductProvide with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProduct() async {
-    final url =
+    var url =
         'https://fir-product-e52b8.firebaseio.com/products.json?auth=$authToken';
     try {
       // Firebase return a Map in response
@@ -72,6 +74,10 @@ class ProductProvide with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      url =
+      'https://fir-product-e52b8.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProduct = [];
       extractedData.forEach((prodId, productData) {
         loadedProduct.add(
@@ -81,7 +87,10 @@ class ProductProvide with ChangeNotifier {
             description: productData['description'],
             imageUrl: productData['imageUrl'],
             price: productData['price'],
-            isFavorite: productData['isFavorite'],
+            // favoriteData == null false value set otherwise valuse set to favoriteData[prodId]
+            // ?? use for alternative value. if favoriteData[prodId] == null false value set otherwise favoriteData[prodId] value set.
+            isFavorite:
+            favoriteData == null ? false : favoriteData[prodId] ?? false,
           ),
         );
       });
@@ -113,7 +122,6 @@ class ProductProvide with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
         }),
       );
       // We also need to save data locally to oyr list.
