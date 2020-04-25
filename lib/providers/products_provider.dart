@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shop/models/http_execotion.dart';
+import 'package:shop/models/http_exception.dart';
 
 import './product.dart';
 
@@ -43,6 +43,13 @@ class ProductProvide with ChangeNotifier {
     )*/
   ];
 
+  String authToken;
+
+  void update(String token) {
+    authToken = token;
+  }
+
+  //ProductProvide(this.authToken, this._items);
   // - This get() use to get list of _items.
   // - Here we are passing copy of " _items " using return [..._items].
   // - All the objects in flutter and dart is reference type.
@@ -54,7 +61,8 @@ class ProductProvide with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProduct() async {
-    const url = 'https://fir-product-e52b8.firebaseio.com/products.json';
+    final url =
+        'https://fir-product-e52b8.firebaseio.com/products.json?auth=$authToken';
     try {
       // Firebase return a Map in response
       // {-M5fUhSvRA4ZKVayjMMJ: {description: Book with great content., imageUrl: https://homepages.cae.wisc.edu/~ece533/images/airplane.png, isFavorite: false, price: 11.22, title: Book},
@@ -90,7 +98,8 @@ class ProductProvide with ChangeNotifier {
     //Firebase database URL = https://"...".firebaseio.com/
     // Here we are adding "/products" to create folder / collection in firebase database.
     // We have to add ".json at the add of url because firebase need that to parse request"
-    const url = 'https://fir-product-e52b8.firebaseio.com/products.json';
+    final url =
+        'https://fir-product-e52b8.firebaseio.com/products.json?auth=$authToken';
     // body: use to pass data and we need to pass json data in body.
     // json.encode convert object into json.
     // await finish http method first
@@ -127,7 +136,8 @@ class ProductProvide with ChangeNotifier {
     // Passing id to URL
     // When we get productIndex then we assign newProduct to that index;
     if (productIndex >= 0) {
-      final url = 'https://fir-product-e52b8.firebaseio.com/products/$id.json';
+      final url =
+          'https://fir-product-e52b8.firebaseio.com/products/$id.json?auth=$authToken';
       await http.patch(
         url,
         body: json.encode(
@@ -152,7 +162,8 @@ class ProductProvide with ChangeNotifier {
     _items.removeWhere((product) => product.id == id);
     notifyListeners();*/
 
-    final url = 'https://fir-product-e52b8.firebaseio.com/products/$id.json';
+    final url =
+        'https://fir-product-e52b8.firebaseio.com/products/$id.json?auth=$authToken';
     final existingProductIndex =
     _items.indexWhere((product) => product.id == id);
     var existingProduct = _items[existingProductIndex];

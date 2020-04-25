@@ -13,7 +13,6 @@ class OrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ordersData = Provider.of<Orders>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Orders'),
@@ -30,12 +29,13 @@ class OrderScreen extends StatelessWidget {
                 child: Text('An error occured!'),
               );
             } else {
-              return Consumer(
+              return Consumer<Orders>(
                 builder: (ctx, orderData, child) =>
                     ListView.builder(
+                      itemCount: orderData.orders.length,
                       itemBuilder: (context, index) =>
                           OrderItem(
-                            ordersData.orders[index],
+                            orderData.orders[index],
                           ),
                     ),
               );

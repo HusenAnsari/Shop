@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/providers/auth.dart';
 import 'package:shop/providers/cart.dart';
 
 import '../providers/cart.dart';
@@ -13,7 +14,7 @@ class ProductItem extends StatelessWidget {
     //get data using Provider which is sanded from "ProductGrid" class.
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
-
+    final authData = Provider.of<Auth>(context, listen: false);
     // We can also use Consumer instead of "Provider.of"
     // When we run Provider.of all build() re-run when data change;
     // Rounded corner using ClipRRect().
@@ -49,7 +50,7 @@ class ProductItem extends StatelessWidget {
                       product.isFavorite ? Icons.favorite : Icons
                           .favorite_border),
                   onPressed: () {
-                    product.toggleFavoriteStatus();
+                    product.toggleFavoriteStatus(authData.token);
                   },
                 ),
           ),
