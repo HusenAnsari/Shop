@@ -1,13 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/models/http_exception.dart';
 
 class Auth with ChangeNotifier {
   String _token;
   String _userId;
   DateTime _expiryDate;
+  Timer _authTimer;
 
   bool get isAuth {
     return token != null;
@@ -26,8 +29,7 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
-  Future<void> _authenticate(
-      String email, String password, String urlSegment) async {
+  Future<void> _authenticate(String email, String password, String urlSegment) async {
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyCfR8UunEm97s3t-V2_0tKD0ZsZ64u4av0';
     try {
@@ -55,6 +57,21 @@ class Auth with ChangeNotifier {
           seconds: int.parse(responseData['expiresIn']),
         ),
       );
+
+      // getInstance() return future so we need to add await
+      // so we can save real access in "preference" instead of Future value.
+      // we can also use json.encode so save data into "SharedPreferences".
+      final preference = await SharedPreferences.getInstance();
+      final userData = json.encode(
+        {
+          'token': _token,
+          'userId': _userId,
+          'expireDate': _expiryDate.toIso8601String(),
+        },
+      );
+      preference.setString('userData', userData);
+      // set auto logout here show we can logout automatically after timer expire.
+      _autoLogout();
       notifyListeners();
     } catch (error) {
       throw error;
@@ -69,6 +86,54 @@ class Auth with ChangeNotifier {
 
   Future<void> login(String email, String password) async {
     return _authenticate(email, password, 'signInWithPassword');
+  }
+
+  Future<bool> tryAutoLogin() async {
+    final preference = await SharedPreferences.getInstance();
+    if (!preference.containsKey('userData')) {
+      return false;
+    }
+    // Here "preference.getString('userData')" return string so we need to convert that into MAP.
+    final extractUserData =
+    json.decode(preference.getString('userData')) as Map<String, Object>;
+    // - Need to parse expireDate to compare date using DateTime.parse as we are store
+    //   date using _expiryDate.toIso8601String();
+    final expiryDate = DateTime.parse(extractUserData['expireDate']);
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+    _token = extractUserData['token'];
+    _userId = extractUserData['userId'];
+    _expiryDate = expiryDate;
+    _autoLogout();
+    notifyListeners();
+    return true;
+  }
+
+  // we convert this function to async so we can clear shared preference
+  Future<void> logout() async {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
+    final preference = await SharedPreferences.getInstance();
+    preference.clear();
+    notifyListeners();
+  }
+
+  void _autoLogout() {
+    // Remaining time calculation.
+    // Here we need to handle if any ongoing timer running and user logout. in this we need to clear the timer first.
+    if (_authTimer != null) {
+      _authTimer.cancel();
+    }
+    final timeToExpiry = _expiryDate
+        .difference(DateTime.now())
+        .inSeconds;
+    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
 

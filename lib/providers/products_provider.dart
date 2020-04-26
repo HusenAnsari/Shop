@@ -62,9 +62,13 @@ class ProductProvide with ChangeNotifier {
     return [..._items];
   }
 
-  Future<void> fetchAndSetProduct() async {
+  // Positional argument with square brackets is optional to pass but we need to assign default value.
+  // When use pass value in the function than default value changes with passed value.
+  Future<void> fetchAndSetProduct([bool filterByUser = false]) async {
+    final filterString =
+    filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     var url =
-        'https://fir-product-e52b8.firebaseio.com/products.json?auth=$authToken';
+        'https://fir-product-e52b8.firebaseio.com/products.json?auth=$authToken&$filterString';
     try {
       // Firebase return a Map in response
       // {-M5fUhSvRA4ZKVayjMMJ: {description: Book with great content., imageUrl: https://homepages.cae.wisc.edu/~ece533/images/airplane.png, isFavorite: false, price: 11.22, title: Book},
@@ -122,6 +126,7 @@ class ProductProvide with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
+          'creatorId': userId,
         }),
       );
       // We also need to save data locally to oyr list.

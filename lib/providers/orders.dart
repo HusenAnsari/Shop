@@ -22,18 +22,20 @@ class OrderItem {
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
   String token;
+  String userId;
 
   List<OrderItem> get orders {
     return [..._orders];
   }
 
-  void update(String authToken) {
+  void update(String authToken, String Id) {
     token = authToken;
+    userId = Id;
   }
 
   Future<void> fetchAndSetOrders() async {
     final url =
-        'https://fir-product-e52b8.firebaseio.com/orders.json?auth=$token';
+        'https://fir-product-e52b8.firebaseio.com/orders/$userId.json?auth=$token';
     final response = await http.get(url);
     // Response:
     // {-M5gkcgUyQWHHOZYoHuX: {amount: 111.99, dateTime: 2020-04-24T20:45:59.063036,
@@ -73,7 +75,7 @@ class Orders with ChangeNotifier {
     // - Here we insert 0 as a index into _orders.insert(0, ) because
     //   we need to recent order as beginning of the orderList;
     final url =
-        'https://fir-product-e52b8.firebaseio.com/orders.json?auth=$token';
+        'https://fir-product-e52b8.firebaseio.com/orders/$userId.json?auth=$token';
     final timeStamp = DateTime.now();
     final response = await http.post(
       url,

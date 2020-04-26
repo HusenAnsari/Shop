@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/screens/auth_screen.dart';
 import 'package:shop/screens/product_overview_screen.dart';
+import 'package:shop/screens/splash_screen.dart';
 
 import './providers/auth.dart';
 import './providers/cart.dart';
 import './providers/orders.dart';
 import './providers/products_provider.dart';
-import './screens/auth_screen.dart';
 import './screens/cart_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/orders_screen.dart';
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, Orders>(
           create: (context) => Orders(),
           update: (context, auth, previousOrders) =>
-          previousOrders..update(auth.token),
+          previousOrders..update(auth.token, auth.userId),
         ),
       ],
       child: Consumer<Auth>(
@@ -60,7 +61,15 @@ class MyApp extends StatelessWidget {
                 accentColor: Colors.deepOrange,
                 fontFamily: 'Lato',
               ),
-              home: authData.isAuth ? ProductOverviewScreen() : AuthScreen(),
+              home: authData.isAuth
+                  ? ProductOverviewScreen()
+                  : FutureBuilder(
+                future: authData.tryAutoLogin(),
+                builder: (context, authResult) =>
+                authResult.connectionState == ConnectionState.waiting
+                    ? SplashScreen()
+                    : AuthScreen(),
+              ),
               // Register all screen to routeTable.
               routes: {
                 ProductDetailScreen.routeName: (context) =>
@@ -71,20 +80,6 @@ class MyApp extends StatelessWidget {
                 EditProductScreen.routeName: (context) => EditProductScreen(),
               },
             ),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Shop'),
-      ),
-      body: Center(
-        child: Text('Let\'s build a shop!'),
       ),
     );
   }
