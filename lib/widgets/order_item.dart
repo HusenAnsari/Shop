@@ -21,61 +21,72 @@ class _OrderItemState extends State<OrderItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(10),
-      child: Column(
-        children: <Widget>[
-          ListTile(
-            title: Text('\$${widget.orderItem.amount}'),
-            subtitle: Text(
-              DateFormat('dd/MM/yyyy - hh:mm').format(
-                widget.orderItem.dateTime,
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      height: _expanded
+          ? min(widget.orderItem.product.length * 20.0 + 110, 200)
+          : 95,
+      child: Card(
+        margin: EdgeInsets.all(10),
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              title: Text('\$${widget.orderItem.amount}'),
+              subtitle: Text(
+                DateFormat('dd/MM/yyyy - hh:mm').format(
+                  widget.orderItem.dateTime,
+                ),
+              ),
+              trailing: IconButton(
+                icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+                onPressed: () {
+                  setState(() {
+                    _expanded = !_expanded;
+                  });
+                },
               ),
             ),
-            trailing: IconButton(
-              icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
-              onPressed: () {
-                setState(() {
-                  _expanded = !_expanded;
-                });
-              },
-            ),
-          ),
-          if (_expanded)
-            Container(
-              // Here min value calculate both value that is 1) widget.orderItem.product.length * 20.0 + 100 and
-              // 2) 180
-              // after calculate set minimum value to height.
-              height: min(widget.orderItem.product.length * 20.0 + 10, 100),
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-              child: ListView(
-                children: widget.orderItem.product
-                    .map(
-                      (product) =>
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            product.title,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              height: _expanded
+                  ? min(widget.orderItem.product.length * 20.0 + 10, 100)
+                  : 0,
+              child: Container(
+                // Here min value calculate both value that is 1) widget.orderItem.product.length * 20.0 + 100 and
+                // 2) 180
+                // after calculate set minimum value to height.
+                height: min(widget.orderItem.product.length * 20.0 + 10, 100),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                child: ListView(
+                  children: widget.orderItem.product
+                      .map(
+                        (product) =>
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              product.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            '${product.quantity}x \$${product.price}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
+                            Text(
+                              '${product.quantity}x \$${product.price}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                )
-                    .toList(),
+                          ],
+                        ),
+                  )
+                      .toList(),
+                ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

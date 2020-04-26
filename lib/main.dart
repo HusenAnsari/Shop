@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/helpers/custom_route.dart';
 import 'package:shop/screens/auth_screen.dart';
 import 'package:shop/screens/product_overview_screen.dart';
 import 'package:shop/screens/splash_screen.dart';
@@ -60,6 +61,12 @@ class MyApp extends StatelessWidget {
                 primarySwatch: Colors.purple,
                 accentColor: Colors.deepOrange,
                 fontFamily: 'Lato',
+
+                //  Using CustomRoute in route level so we can assign animation to all page.
+                pageTransitionsTheme: PageTransitionsTheme(builders: {
+                  TargetPlatform.android: CustomPageTransitionsBuilder(),
+                  TargetPlatform.iOS: CustomPageTransitionsBuilder()
+                }),
               ),
               home: authData.isAuth
                   ? ProductOverviewScreen()
