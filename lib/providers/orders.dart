@@ -55,14 +55,13 @@ class Orders with ChangeNotifier {
           dateTime: DateTime.parse(orderData['dateTime']),
           product: (orderData['product'] as List<dynamic>)
               .map(
-                (items) =>
-                CartItem(
+                (items) => CartItem(
                   id: items['id'],
                   price: items['price'],
                   title: items['title'],
                   quantity: items['quantity'],
                 ),
-          )
+              )
               .toList(),
         ),
       );
@@ -83,13 +82,12 @@ class Orders with ChangeNotifier {
         'amount': total,
         'dateTime': timeStamp.toIso8601String(),
         'product': cartProduct
-            .map((cp) =>
-        {
-          'id': cp.id,
-          'title': cp.title,
-          'quantity': cp.quantity,
-          'price': cp.price,
-        })
+            .map((cp) => {
+                  'id': cp.id,
+                  'title': cp.title,
+                  'quantity': cp.quantity,
+                  'price': cp.price,
+                })
             .toList(),
       }),
     );

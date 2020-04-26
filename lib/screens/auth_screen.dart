@@ -119,7 +119,7 @@ class _AuthCardState extends State<AuthCard>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    /*_animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
@@ -128,9 +128,9 @@ class _AuthCardState extends State<AuthCard>
       end: Size(double.infinity, 320),
     ).animate(
       CurvedAnimation(curve: Curves.linear, parent: _animationController),
-    );
+    );*/
     // we need to call setState to re run and draw the screen to see animation.
-    _heightAnimation.addListener(() => setState(() {}));
+    //_heightAnimation.addListener(() => setState(() {}));
   }
 
   @override
@@ -212,12 +212,12 @@ class _AuthCardState extends State<AuthCard>
       setState(() {
         _authMode = AuthMode.Signup;
       });
-      _animationController.forward();
+      //_animationController.forward();
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
-      _animationController.reverse();
+      //_animationController.reverse();
     }
   }
 
@@ -233,17 +233,18 @@ class _AuthCardState extends State<AuthCard>
       elevation: 8.0,
       // Here childForm contain our Form() widget.
       // Using AnimatedBuilder() we can only re-Render the height of the container. not all widget that is in container
-      child: AnimatedBuilder(
-        animation: _heightAnimation,
-        builder: (context, childForm) =>
-            Container(
-              //height: _authMode == AuthMode.Signup ? 320 : 260,
-                height: _heightAnimation.value.height,
-                constraints:
-                BoxConstraints(minHeight: _heightAnimation.value.height),
-                width: deviceSize.width * 0.75,
-                padding: EdgeInsets.all(16.0),
-                child: childForm),
+      //height: _authMode == AuthMode.Signup ? 320 : 260,
+
+      // when we use AnimatedContainer() no need to control animation manually.
+      // so we comment _heightAnimation from initState() still animation work.
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+        height: _authMode == AuthMode.Signup ? 320 : 260,
+        constraints:
+        BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
