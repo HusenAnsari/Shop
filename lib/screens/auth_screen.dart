@@ -231,12 +231,19 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        //height: _authMode == AuthMode.Signup ? 320 : 260,
-        height: _heightAnimation.value.height,
-        constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+      // Here childForm contain our Form() widget.
+      // Using AnimatedBuilder() we can only re-Render the height of the container. not all widget that is in container
+      child: AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (context, childForm) =>
+            Container(
+              //height: _authMode == AuthMode.Signup ? 320 : 260,
+                height: _heightAnimation.value.height,
+                constraints:
+                BoxConstraints(minHeight: _heightAnimation.value.height),
+                width: deviceSize.width * 0.75,
+                padding: EdgeInsets.all(16.0),
+                child: childForm),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(

@@ -29,8 +29,8 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
-  Future<void> _authenticate(String email, String password,
-      String urlSegment) async {
+  Future<void> _authenticate(
+      String email, String password, String urlSegment) async {
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyCfR8UunEm97s3t-V2_0tKD0ZsZ64u4av0';
     try {
@@ -96,7 +96,7 @@ class Auth with ChangeNotifier {
     }
     // Here "preference.getString('userData')" return string so we need to convert that into MAP.
     final extractUserData =
-    json.decode(preference.getString('userData')) as Map<String, Object>;
+        json.decode(preference.getString('userData')) as Map<String, Object>;
     // - Need to parse expireDate to compare date using DateTime.parse as we are store
     //   date using _expiryDate.toIso8601String();
     final expiryDate = DateTime.parse(extractUserData['expireDate']);
@@ -131,9 +131,7 @@ class Auth with ChangeNotifier {
     if (_authTimer != null) {
       _authTimer.cancel();
     }
-    final timeToExpiry = _expiryDate
-        .difference(DateTime.now())
-        .inSeconds;
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
